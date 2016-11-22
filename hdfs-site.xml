@@ -1,0 +1,21 @@
+<configuration>
+  <property>
+    <name>dfs.datanode.use.datanode.hostname</name>
+    <value>false</value>
+  </property>
+
+  <property>
+     <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
+     <value>false</value>
+  </property>
+  <property>
+    <name>dfs.data.dir</name>
+    <value>/tmp/hadoop/data/</value> 
+    <final>true</final> 
+  </property> 
+  <property> 
+    <name>dfs.name.dir</name>
+    <value>/tmp/hadoop/name</value> 
+    <final>true</final> 
+  </property>
+</configuration>
