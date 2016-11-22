@@ -3,13 +3,13 @@ FROM sequenceiq/hadoop-ubuntu:2.6.0
 RUN groupadd hadoop
 RUN usermod -a -G hadoop root
 RUN chown -R root:hadoop $HADOOP_PREFIX
-RUN chmod -R 775 $HADOOP_PREFIX 
+RUN chmod -R 777 $HADOOP_PREFIX 
 
 ADD bootstrap.sh /etc/bootstrap.sh
 RUN chown -R root:hadoop /etc/bootstrap.sh
 RUN chmod 755 /etc/bootstrap.sh
 
-RUN $BOOTSTRAP && $HADOOP_PREFIX/bin/hadoop dfsadmin -safemode leave && $HADOOP_PREFIX/bin/hadoop fs -chmod 777 /
+RUN service ssh start && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && $HADOOP_PREFIX/bin/hadoop dfsadmin -safemode leave && $HADOOP_PREFIX/bin/hadoop fs -chmod 777 /
 
 ENV GOSU_VERSION 1.9
 RUN set -x \
@@ -24,5 +24,8 @@ RUN set -x \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
     && apt-get purge -y --auto-remove ca-certificates wget
+
+RUN echo "AuthorizedKeysFile	/root/.ssh/authorized_keys" >> /etc/ssh/sshd_config
+RUN echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
 
 CMD ["/etc/bootstrap.sh", "-d"]

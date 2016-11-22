@@ -21,12 +21,14 @@ export HOME=/home/user
 /usr/local/bin/gosu user rm -f $HOME/.ssh/id_rsa
 /usr/local/bin/gosu user ssh-keygen -q -N "" -t rsa -f $HOME/.ssh/id_rsa
 /usr/local/bin/gosu user cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+cat /root/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 cat $HOME/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 cat /root/.ssh/config > $HOME/.ssh/config
 chown user:hadoop $HOME/.ssh/config
 chmod 600 $HOME/.ssh/config
 
 service ssh start
+/usr/local/bin/gosu user ssh-copy-id -i $HOME/.ssh/id_rsa.pub user@sandbox
 /usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-dfs.sh
 /usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-yarn.sh
 
