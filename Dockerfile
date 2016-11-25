@@ -1,7 +1,4 @@
-FROM sequenceiq/pam:ubuntu-14.04
-MAINTAINER SequenceIQ
-
-USER root
+FROM ubuntu:16.04
 
 # install dev tools
 RUN apt-get update
@@ -13,6 +10,17 @@ RUN ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key
 RUN ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key
 RUN ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa
 RUN cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
+
+# ssh config
+ADD ssh_config /etc/ssh/ssh_config
+ADD ssh_config /root/.ssh/config
+RUN chmod 600 /root/.ssh/config
+RUN chown root:root /root/.ssh/config
+
+# sshd config
+RUN echo "Port 2122" >> /etc/ssh/sshd_config
+RUN echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+RUN echo "AllowUsers user root" >> /etc/ssh/sshd_config
 
 # java
 RUN mkdir -p /usr/java/default && \
@@ -41,23 +49,14 @@ ADD yarn-site.xml $HADOOP_PREFIX/etc/hadoop/yarn-site.xml
 ADD core-site.xml $HADOOP_PREFIX/etc/hadoop/core-site.xml
 
 # fixing the libhadoop.so like a boss
-RUN rm  /usr/local/hadoop/lib/native/*
-RUN curl -Ls http://dl.bintray.com/sequenceiq/sequenceiq-bin/hadoop-native-64-2.6.0.tar|tar -x -C /usr/local/hadoop/lib/native/
-
-ADD ssh_config /root/.ssh/config
-RUN chmod 600 /root/.ssh/config
-RUN chown root:root /root/.ssh/config
+#RUN rm  /usr/local/hadoop/lib/native/*
+#RUN curl -Ls http://dl.bintray.com/sequenceiq/sequenceiq-bin/hadoop-native-64-2.6.0.tar|tar -x -C /usr/local/hadoop/lib/native/
 
 
 # workingaround docker.io build error
 RUN ls -la /usr/local/hadoop/etc/hadoop/*-env.sh
 RUN chmod +x /usr/local/hadoop/etc/hadoop/*-env.sh
 RUN ls -la /usr/local/hadoop/etc/hadoop/*-env.sh
-
-# fix the 254 error code
-RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/"  /etc/ssh/sshd_config
-RUN echo "UsePAM no" >> /etc/ssh/sshd_config
-RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
 #####################################################
 RUN groupadd hadoop
@@ -82,13 +81,6 @@ RUN set -x \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
     && apt-get purge -y --auto-remove ca-certificates wget
-
-RUN echo "AuthorizedKeysFile	/root/.ssh/authorized_keys" >> /etc/ssh/sshd_config
-RUN echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
-ADD ./core-site.xml /tmp/core-site.xml
-ADD ./hdfs-site.xml /tmp/hdfs-site.xml
-RUN echo "Port 9000" >> /etc/ssh/sshd_config
-RUN export PATH=$PATH:$JAVA_HOME/bin
 
 ENV PATH $PATH:$JAVA_HOME/bin
 ENV HADOOP_CONF_DIR /usr/local/hadoop/etc/hadoop

@@ -1,17 +1,7 @@
 #!/bin/bash
 
 : ${HADOOP_PREFIX:=/usr/local/hadoop}
-
-$HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
-
-rm /tmp/*.pid
-
-# installing libraries if any - (resource urls added comma separated to the ACP system variable)
-cd $HADOOP_PREFIX/share/hadoop/common ; for cp in ${ACP//,/ }; do  echo == $cp; curl -LO $cp ; done; cd -
-
-# altering the core-site configuration
-
-USER_ID=${LOCAL_USER_ID:-9001}
+USER_ID=${LOCAL_USER_ID:-1000}
 echo "Starting with UID : $USER_ID"
 useradd --shell /bin/bash -u $USER_ID -o -c "" -m user
 usermod -a -G hadoop user
@@ -29,20 +19,21 @@ chmod 600 $HOME/.ssh/config
 
 #chown user /usr/local/hadoop/logs
 
-mkdir /tmp/hadoop
-mkdir /tmp/hadoop/tmp
-mkdir /tmp/hadoop/data
-mkdir /tmp/hadoop/name
-chmod -R 777 /tmp/hadoop/
+mkdir /hadoopApp/
+mkdir /hadoopApp/tmp
+mkdir /hadoopApp/data
+mkdir /hadoopApp/name
+chown -R user:hadoop /hadoopApp/
+chmod -R 775 /hadoopApp/
 
+/usr/local/bin/gosu user echo "PATH=$PATH:$JAVA_HOME/bin\nPATH=$PATH:/usr/local/hadoop/bin\nHADOOP_PREFIX=/usr/local/hadoop\nHADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop" >> $HOME/.bashrc
 /usr/local/bin/gosu user $HADOOP_PREFIX/bin/hdfs namenode -format
 
+service ssh start
 /usr/local/bin/gosu user ssh-copy-id -i $HOME/.ssh/id_rsa.pub user@sandbox
-
-#service ssh start
-#/usr/local/bin/gosu user $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
-#/usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-dfs.sh
-#/usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-yarn.sh
+/usr/local/bin/gosu user $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
+/usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-dfs.sh
+/usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-yarn.sh
 
 CMD=${1:-"exit 0"}
 if [[ "$CMD" == "-d" ]];

@@ -10,12 +10,12 @@
   </property>
   <property>
     <name>dfs.data.dir</name>
-    <value>/tmp/hadoop/data/</value> 
+    <value>/hadoopApp/data/</value> 
     <final>true</final> 
   </property> 
   <property> 
     <name>dfs.name.dir</name>
-    <value>/tmp/hadoop/name</value> 
+    <value>/hadoopApp/name</value> 
     <final>true</final> 
   </property>
 </configuration>
