@@ -26,11 +26,17 @@ mkdir /hadoopApp/name
 chown -R user:hadoop /hadoopApp/
 chmod -R 775 /hadoopApp/
 
+#
+sed -i "s|sandbox|$HOSTNAME|g" $HADOOP_PREFIX/etc/hadoop/mapred-site.xml
+sed -i "s|sandbox|$HOSTNAME|g" $HADOOP_PREFIX/etc/hadoop/hdfs-site.xml
+sed -i "s|sandbox|$HOSTNAME|g" $HADOOP_PREFIX/etc/hadoop/yarn-site.xml
+sed -i "s|sandbox|$HOSTNAME|g" $HADOOP_PREFIX/etc/hadoop/core-site.xml
+#
 /usr/local/bin/gosu user echo "PATH=$PATH:$JAVA_HOME/bin\nPATH=$PATH:/usr/local/hadoop/bin\nHADOOP_PREFIX=/usr/local/hadoop\nHADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop" >> $HOME/.bashrc
 /usr/local/bin/gosu user $HADOOP_PREFIX/bin/hdfs namenode -format
 
 service ssh start
-/usr/local/bin/gosu user ssh-copy-id -i $HOME/.ssh/id_rsa.pub user@sandbox
+/usr/local/bin/gosu user ssh-copy-id -i $HOME/.ssh/id_rsa.pub user@$HOSTNAME
 /usr/local/bin/gosu user $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 /usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-dfs.sh
 /usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-yarn.sh
