@@ -1,5 +1,5 @@
 # hadoop-non-root
-This a hadoop:2.6 image on which dfs and yarn service are run by a non-root user. It's based on sequenceiq/hadoop-docker.
+This a hadoop:2.6 image on which dfs and yarn service are run by a non-root user. It's based on [sequenceiq/hadoop-docker](https://github.com/sequenceiq/hadoop-docker).
 
 You won't be annoyed by permission issues when you clean up the output files written by hadoop workers in a mount volume.
 
