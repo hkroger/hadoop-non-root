@@ -42,16 +42,17 @@ sed -i "s|sandbox|$HOSTNAME|g" $HADOOP_PREFIX/etc/hadoop/core-site.xml
 
 # start sshd, hadoop and yarn service
 service ssh start
+source $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
+
 /usr/local/bin/gosu user ssh-copy-id -i $HOME/.ssh/id_rsa.pub user@$HOSTNAME
-/usr/local/bin/gosu user $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 /usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-dfs.sh
 /usr/local/bin/gosu user $HADOOP_PREFIX/sbin/start-yarn.sh
 
-CMD=${1:-"exit 0"}
-if [[ "$CMD" == "-d" ]];
-then
-	service ssh stop
-	/usr/sbin/ssh -D -d
-else
-	/bin/bash -c "$*"
+if [[ $1 == "-d" ]]; then
+  while true; do sleep 1000; done
 fi
+
+if [[ $1 == "-bash" ]]; then
+  /bin/bash
+fi
+
