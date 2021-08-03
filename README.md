@@ -20,13 +20,13 @@ docker pull hkroger/hadoop-non-root
 Simple:
 
 ```bash
-docker run -it -e LOCAL_USER_ID=1000 hkroger/hadoop-non-root -bash
+docker run -it -e LOCAL_USER_ID=1000 LOCAL_USER_NAME=myuser hkroger/hadoop-non-root -bash
 ```
 
 All ports published:
 
 ```bash
-docker run -it -e LOCAL_USER_ID=1000 -p 9000:9000 -p 50010:50010 -p 50020:50020 -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 8020:8020 hkroger/hadoop-non-root -bash
+docker run -it -e LOCAL_USER_ID=1000 LOCAL_USER_NAME=myuser -p 9000:9000 -p 50010:50010 -p 50020:50020 -p 50070:50070 -p 50075:50075 -p 50090:50090 -p 8020:8020 hkroger/hadoop-non-root -bash
 ```
 
 ## Reference
